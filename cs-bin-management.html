@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bin Management — Case Study | Deepali Nagarsekar</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg-primary: #0a0e1a;
+        --bg-secondary: #111627;
+        --bg-card: #161d30;
+        --bg-card-hover: #1c2540;
+        --accent: #1abcaa;
+        --accent-light: #22d4c0;
+        --accent-dim: rgba(26, 188, 170, 0.12);
+        --accent-border: rgba(26, 188, 170, 0.3);
+        --text-primary: #f0f4ff;
+        --text-secondary: #8b9ab8;
+        --text-muted: #5a6a88;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-strong: rgba(255, 255, 255, 0.13);
+        --blue-dim: rgba(99, 130, 255, 0.1);
+        --blue-border: rgba(99, 130, 255, 0.3);
+        --blue: #6382ff;
+        --purple-dim: rgba(168, 120, 255, 0.1);
+        --purple: #a878ff;
+        --amber-dim: rgba(255, 177, 77, 0.1);
+        --amber: #ffb14d;
+        --green-dim: rgba(72, 207, 150, 0.1);
+        --green: #48cf96;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(10, 14, 26, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 2rem;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-logo {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        text-decoration: none;
+        letter-spacing: 0.02em;
+      }
+      .nav-logo span {
+        color: var(--accent);
+      }
+      .nav-back {
+        font-size: 13px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s;
+      }
+      .nav-back:hover {
+        color: var(--accent);
+      }
+      .nav-back svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* ── LAYOUT ── */
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        padding: 120px 0 80px;
+        border-bottom: 1px solid var(--border);
+      }
+      .hero-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+      }
+      .tag {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--accent-border);
+        color: var(--accent);
+        background: var(--accent-dim);
+      }
+      .tag-plain {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+        background: transparent;
+      }
+      .hero h1 {
+        font-size: clamp(32px, 5vw, 52px);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.25rem;
+        color: var(--text-primary);
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero-subtitle {
+        font-size: 18px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        max-width: 680px;
+        margin-bottom: 2.5rem;
+      }
+      .hero-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 700px;
+      }
+      .meta-item {
+        background: var(--bg-secondary);
+        padding: 1rem 1.25rem;
+      }
+      .meta-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      .meta-value {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        padding: 80px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      section:last-child {
+        border-bottom: none;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section-label::after {
+        content: "";
+        flex: 1;
+        max-width: 40px;
+        height: 1px;
+        background: var(--accent-border);
+      }
+
+      h2 {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+      }
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+      p {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        font-size: 15px;
+        line-height: 1.8;
+      }
+      p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ── CARDS ── */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      .card:hover {
+        border-color: var(--border-strong);
+        background: var(--bg-card-hover);
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      @media (max-width: 640px) {
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .grid-3 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      /* ── QUOTE ── */
+      .quote {
+        border-left: 3px solid var(--accent);
+        padding: 1.25rem 1.5rem;
+        background: var(--accent-dim);
+        border-radius: 0 10px 10px 0;
+        margin: 2rem 0;
+      }
+      .quote p {
+        font-size: 16px;
+        font-style: italic;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+      .quote-attr {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-style: normal;
+      }
+
+      /* ── INSIGHT CARDS ── */
+      .insight-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+      .insight-badge {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.6rem;
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 6px;
+      }
+      .badge-pain {
+        background: rgba(255, 100, 100, 0.12);
+        color: #ff8080;
+      }
+      .badge-model {
+        background: var(--blue-dim);
+        color: var(--blue);
+      }
+      .badge-constraint {
+        background: var(--purple-dim);
+        color: var(--purple);
+      }
+
+      /* ── WORKFLOW BLOCKS ── */
+      .workflow-block {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+        transition: border-color 0.2s;
+      }
+      .workflow-block:hover {
+        border-color: var(--border-strong);
+      }
+      .workflow-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .workflow-tag {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 8px;
+      }
+      .wt-audit {
+        background: rgba(26, 188, 170, 0.15);
+        color: #1abcaa;
+      }
+      .wt-transfer {
+        background: var(--blue-dim);
+        color: var(--blue);
+      }
+      .wt-retrieval {
+        background: var(--purple-dim);
+        color: var(--purple);
+      }
+      .wt-restore {
+        background: var(--amber-dim);
+        color: var(--amber);
+      }
+
+      .workflow-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .workflow-desc {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 1rem;
+      }
+      .step-flow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .step-pill {
+        font-size: 12px;
+        color: var(--text-secondary);
+        background: var(--bg-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 20px;
+        padding: 4px 12px;
+        white-space: nowrap;
+      }
+      .step-arrow {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      /* ── DECISION CARDS ── */
+      .decision-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 12px 12px 0;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .decision-card h3 {
+        margin-bottom: 0.35rem;
+      }
+
+      /* ── IMPACT GRID ── */
+      .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+      @media (max-width: 640px) {
+        .impact-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .impact-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem 1.25rem;
+        text-align: center;
+      }
+      .impact-number {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+      .impact-desc {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      /* ── IMAGE PLACEHOLDER ── */
+      .img-placeholder {
+        background: var(--bg-card);
+        border: 1px dashed var(--border-strong);
+        border-radius: 14px;
+        height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin: 2rem 0;
+      }
+      .img-placeholder svg {
+        color: var(--text-muted);
+        opacity: 0.5;
+      }
+      .img-placeholder span {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      /* ── REFLECTION LIST ── */
+      .reflection-list {
+        list-style: none;
+      }
+      .reflection-list li {
+        font-size: 15px;
+        color: var(--text-secondary);
+        line-height: 1.75;
+        padding: 0.85rem 0 0.85rem 1.75rem;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .reflection-list li:last-child {
+        border-bottom: none;
+      }
+      .reflection-list li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-size: 14px;
+        top: 0.9rem;
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        padding: 3rem 0;
+        text-align: center;
+        border-top: 1px solid var(--border);
+      }
+      footer p {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin: 0;
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* ── MISC ── */
+      .spacer {
+        height: 1.5rem;
+      }
+      .mt-lg {
+        margin-top: 2rem;
+      }
+      .text-accent {
+        color: var(--accent);
+      }
+
+      /* ── STICKY PROGRESS BAR ── */
+      #progress-bar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: 2px;
+        background: var(--accent);
+        z-index: 99;
+        width: 0%;
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress-bar"></div>
+
+    <!-- NAV -->
+    <nav>
+      <a href="https://deepali-ux.github.io/DNdesign/" class="nav-logo"
+        >Deepali <span>N.</span></a
+      >
+      <a href="https://deepali-ux.github.io/DNdesign/#work" class="nav-back">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        Back to work
+      </a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="container">
+        <div class="hero-eyebrow">
+          <span class="tag">Case Study</span>
+          <span class="tag-plain">B2B Internal Tool</span>
+          <span class="tag-plain">Warehouse Operations</span>
+        </div>
+        <h1>Bin Management —<br /><em>Warehouse Operations</em> Platform</h1>
+        <p class="hero-subtitle">
+          Replacing a fragmented multi-spreadsheet workflow with a single,
+          guided digital system for inventory storage, retrieval, auditing, and
+          transfers — for Grassdoor's cannabis distribution warehouses.
+        </p>
+        <div class="hero-meta">
+          <div class="meta-item">
+            <div class="meta-label">Role</div>
+            <div class="meta-value">UX Designer + Product</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Company</div>
+            <div class="meta-value">Grassdoor</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Scope</div>
+            <div class="meta-value">4 core workflows</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Methods</div>
+            <div class="meta-value">Research · Flows · Wireframes</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Status</div>
+            <div class="meta-value">Shipped to production</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: BACKGROUND -->
+    <section id="background">
+      <div class="container">
+        <div class="section-label">01 — Background</div>
+        <h2>The problem space</h2>
+        <p>
+          Grassdoor operates large-scale cannabis distribution warehouses —
+          30,000 sq ft facilities with 30+ racks, hundreds of bins, and
+          thousands of SKUs moving in and out daily. The operations team —
+          pickers, general managers, and inventory specialists — were managing
+          all of this across a patchwork of Google Sheets, an internal portal,
+          and manual physical checks. There was no single source of truth.
+        </p>
+        <p>
+          I was brought in as the UX lead (with product ownership) to design the
+          Bin Management module within the internal Warehouse Portal — covering
+          how products are stored after receiving, retrieved for order packing,
+          audited for accuracy, and transferred between facilities.
+        </p>
+
+        <div class="spacer"></div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>The as-is reality</h3>
+            <p style="margin: 0">
+              Pickers toggled between 3–5 tabs simultaneously: the warehouse
+              portal for order data, Google Sheets for bin locations, separate
+              spreadsheets for QC tracking, and manual physical checks to
+              confirm stock.
+            </p>
+          </div>
+          <div class="card">
+            <h3>What we set out to do</h3>
+            <p style="margin: 0">
+              Design one unified flow where the system tells the picker exactly
+              where to go, what to scan, and flags any discrepancies in real
+              time — eliminating the spreadsheet dependency entirely.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: DISCOVERY -->
+    <section id="discovery">
+      <div class="container">
+        <div class="section-label">02 — Discovery</div>
+        <h2>Understanding the real workflow</h2>
+        <p>
+          Before sketching a single screen, I ran a remote moderated research
+          session (1 hour) with 5 end-user representatives across the LA and SF
+          facilities — general managers, operation specialists, and inventory
+          pickers. The goal was to observe the current-state workflow in action,
+          not just hear about it.
+        </p>
+
+        <div class="quote">
+          <p>
+            "Since we have to manage the portal as well as the spreadsheet, we
+            need to use split screen — if it was just one platform, a tablet or
+            mobile would have been really easy to work with."
+          </p>
+          <span class="quote-attr"
+            >— Warehouse General Manager, LA facility</span
+          >
+        </div>
+
+        <p>
+          Participants included Anakin Hambrink (General Manager, 4 years
+          experience), Gabriella Legarreta (Operations Specialist), Samantha
+          Pelayo, Jose Maldonado, Kayla Gonzalez, and Philip — representing both
+          LA and SF facilities. This cross-facility coverage was important
+          because each location has different aisle counts, layouts, and batch
+          structures.
+        </p>
+
+        <div class="spacer"></div>
+        <p
+          style="
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+          "
+        >
+          Key research findings
+        </p>
+        <div class="grid-2">
+          <div class="insight-card">
+            <span class="insight-badge badge-pain">Pain point</span>
+            <p style="font-size: 14px; margin: 0">
+              Pickers manually typed each product ID into a spreadsheet to
+              generate a pick list — 15 to 60 seconds per PID just to find a
+              location for a single item in a 15-unit order.
+            </p>
+          </div>
+          <div class="insight-card">
+            <span class="insight-badge badge-pain">Pain point</span>
+            <p style="font-size: 14px; margin: 0">
+              All totes were visually identical — no system-level catch for
+              wrong-bag or missing-item errors. Manual QC at the end was the
+              only safeguard, requiring an extra team member.
+            </p>
+          </div>
+          <div class="insight-card">
+            <span class="insight-badge badge-model">Mental model</span>
+            <p style="font-size: 14px; margin: 0">
+              The team used "Section / Row / Bin" in daily conversation, but the
+              spreadsheet used different labels (Aisle / Rack / Slot). This
+              terminology mismatch caused daily confusion and handoff errors.
+            </p>
+          </div>
+          <div class="insight-card">
+            <span class="insight-badge badge-constraint">Constraint</span>
+            <p style="font-size: 14px; margin: 0">
+              Multiple orders cannot be packed simultaneously — too high a risk
+              of cross-contamination across ~30 exit bags. One order at a time
+              is a deliberate operational rule, not a tech limitation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: STRUCTURE -->
+    <section id="structure">
+      <div class="container">
+        <div class="section-label">03 — Warehouse structure</div>
+        <h2>Mapping the physical space to a data model</h2>
+        <p>
+          Before designing screens, I mapped the physical warehouse hierarchy
+          into a logical model the system would need to reflect. Products flow
+          from individual Master Packs (MPs) → grouped into Case Packs (CPs) →
+          placed in Bins (Slots) → within Racks → within Aisles (Sections).
+          Active inventory (aisles 1–18) holds the current FIFO batch.
+          Non-active batches live in aisles 21–28.
+        </p>
+
+        <img
+          src="images/Demographics.png"
+          alt="Warehouse hierarchy diagram showing Top View, Section from front view, and Case-pack from Front View"
+          style="width: 100%; margin: 2rem auto"
+        />
+
+        <p>
+          A critical early decision was standardising naming. I proposed
+          adopting
+          <strong style="color: var(--text-primary); font-weight: 600"
+            >Aisle → Rack → Slot</strong
+          >
+          as the canonical system terminology — replacing the inconsistent
+          "Section / Row / Bin" mix that lived across existing spreadsheets and
+          verbal communication. This single alignment prevented naming conflicts
+          across all four workflows and significantly reduced confusion during
+          developer handoff.
+        </p>
+
+        <div class="grid-3 mt-lg">
+          <div class="card" style="text-align: center">
+            <div
+              style="
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--accent);
+                margin-bottom: 0.4rem;
+              "
+            >
+              MP
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              Master Pack<br />Individual unit
+            </div>
+          </div>
+          <div class="card" style="text-align: center">
+            <div
+              style="
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--blue);
+                margin-bottom: 0.4rem;
+              "
+            >
+              CP
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              Case Pack<br />Group of MPs
+            </div>
+          </div>
+          <div class="card" style="text-align: center">
+            <div
+              style="
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--purple);
+                margin-bottom: 0.4rem;
+              "
+            >
+              Bin
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary)">
+              Slot in a Rack<br />within an Aisle
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: WORKFLOWS -->
+    <section id="workflows">
+      <div class="container">
+        <div class="section-label">04 — The four workflows</div>
+        <h2>Designing end-to-end, not screen-by-screen</h2>
+        <p>
+          Rather than designing isolated screens, I mapped full use-case flows
+          for each workflow — starting from a user story, through a detailed use
+          case with step-by-step logic, into a user flow diagram. This gave me
+          and the engineering team a shared contract before any high-fidelity
+          work began.
+        </p>
+
+        <div class="spacer"></div>
+
+        <!-- Audit -->
+        <div class="workflow-block">
+          <div class="workflow-header">
+            <span class="workflow-tag wt-audit">Audit</span>
+            <span class="workflow-title">Inventory cycle count</span>
+          </div>
+          <p class="workflow-desc">
+            Warehouse managers needed to verify physical stock against system
+            records — one product at a time, bin by bin. The process starts with
+            selecting a product to audit, then scanning each bin to check if
+            Case Packs and Master Packs match what the system expects. Missing
+            CPs get flagged and marked as "adjusted/missing" after user
+            confirmation. A post-audit report captures everything for
+            compliance. The key design challenge was handling mismatch states
+            gracefully — keeping the user in control rather than blocking them.
+          </p>
+          <div class="step-flow">
+            <span class="step-pill">Select product</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">View audit guide</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Scan bin barcode</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Scan CPs in bin</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Report MP mismatch</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Save / mark adjusted</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Post-audit report</span>
+          </div>
+        </div>
+
+        <!-- Transfer -->
+        <div class="workflow-block">
+          <div class="workflow-header">
+            <span class="workflow-tag wt-transfer">Transfer</span>
+            <span class="workflow-title"
+              >Batch inventory transfer between facilities</span
+            >
+          </div>
+          <p class="workflow-desc">
+            Moving inventory between facilities (e.g. SF Distribution to LA
+            Retail) requires strict regulatory compliance — the entire Metrc
+            batch tag must be transferred, never partial. I designed a Transfer
+            Guide panel that shows exactly which aisles, racks, and bins hold
+            the selected SKU, with real-time bin-level progress as CPs are
+            scanned. The Transfer button only activates when 100% of the Metrc
+            batch is accounted for — building the compliance requirement into
+            the interaction itself.
+          </p>
+          <div class="step-flow">
+            <span class="step-pill">Select from / to facility</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Select SKU + Metrc tag</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Check transfer guide</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Scan CPs</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Scan loose MPs</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Transfer (when 100%)</span>
+          </div>
+        </div>
+
+        <!-- Retrieval -->
+        <div class="workflow-block">
+          <div class="workflow-header">
+            <span class="workflow-tag wt-retrieval">Retrieval</span>
+            <span class="workflow-title">Order packing</span>
+          </div>
+          <p class="workflow-desc">
+            This was the highest-frequency workflow — happening dozens of times
+            per day. The current process required pickers to manually type PIDs
+            into a separate picker spreadsheet to get bin locations. The
+            proposed system auto-generates a FIFO-ordered pick list (aisle 1 →
+            18) directly from the order scan, with bin suggestions based on
+            manufacture date, the correct bag brand and size, and barcode
+            scanning to confirm each Master Pack as it's added. One order at a
+            time by design — which research confirmed is the right constraint to
+            prevent cross-bag errors.
+          </p>
+          <div class="step-flow">
+            <span class="step-pill">Scan order barcode</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">View FIFO picker list</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Enter picker name</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">View correct bag</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Scan MPs into bag</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Save + ready for QC</span>
+          </div>
+        </div>
+
+        <!-- Restore -->
+        <div class="workflow-block">
+          <div class="workflow-header">
+            <span class="workflow-tag wt-restore">Restore</span>
+            <span class="workflow-title">Return Master Packs to bins</span>
+          </div>
+          <p class="workflow-desc">
+            When full bags are pulled out, destroyed, or orders are returned,
+            Master Packs need to go back into the correct Case Packs in the
+            correct bins. Previously this required Google Sheets and manual
+            coordination. The proposed flow: scan the destination CP, scan each
+            MP into it, place the CP back in the bin, and the system updates
+            inventory automatically — eliminating the third-party tool
+            dependency and creating a reliable paper trail for every MP
+            movement.
+          </p>
+          <div class="step-flow">
+            <span class="step-pill">Scan destination CP</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Scan MPs into CP</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">Place CP back in bin</span
+            ><span class="step-arrow">›</span>
+            <span class="step-pill">System auto-updates</span>
+          </div>
+        </div>
+
+         <img
+          src="images/Storyboard.png"
+          alt="Storyboard sketches showing the four warehouse workflows: receiving product to master pack, master pack to case pack, and allocating case pack to bin"
+          style="width: 100%; margin: 2rem auto"
+        />
+    </section>
+
+    <!-- SECTION 5: DESIGN DECISIONS -->
+    <section id="decisions">
+      <div class="container">
+        <div class="section-label">05 — Key design decisions</div>
+        <h2>Where the hard thinking happened</h2>
+        <p>
+          Good UX for internal tools isn't about aesthetics — it's about
+          removing the mental load from people who are physically moving through
+          a warehouse, often with their hands full. Every major decision was
+          driven by that constraint.
+        </p>
+
+        <div class="spacer"></div>
+
+        <div class="decision-card">
+          <h3>Guided panels over free-form search</h3>
+          <p style="margin: 0; font-size: 14px">
+            For both Audit and Transfer, I introduced a contextual Guide panel
+            that shows the user exactly where in the warehouse to go — broken
+            down by Aisle, Rack, and Bin with visual progress indicators (green
+            = complete, partial = in progress, white = not started). This
+            removed the need to cross-reference a spreadsheet mid-task. The
+            panel updates live as items are scanned.
+          </p>
+        </div>
+
+        <div class="decision-card">
+          <h3>Progressively activating actions to encode compliance</h3>
+          <p style="margin: 0; font-size: 14px">
+            For Transfer, the Transfer button remains disabled until the
+            complete Metrc batch has been scanned — a regulatory hard
+            constraint. Rather than showing an error after the fact, the UI
+            communicates progress continuously (a percentage bar + CP count tab)
+            so the user always knows exactly what remains. The constraint
+            becomes the interface.
+          </p>
+        </div>
+
+        <div class="decision-card">
+          <h3>FIFO baked into suggestions, not enforced by memory</h3>
+          <p style="margin: 0; font-size: 14px">
+            Products must be picked in First-In-First-Out order — but previously
+            this was entirely a human memory task. I designed the pick list to
+            surface the recommended Aisle + Rack based on manufacture date
+            automatically, so pickers follow FIFO without needing to reason
+            about it. Making the right path the obvious path.
+          </p>
+        </div>
+
+        <div class="decision-card">
+          <h3>Mismatch states as first-class flows, not error dismissals</h3>
+          <p style="margin: 0; font-size: 14px">
+            During audit, CP and MP mismatches aren't errors to dismiss —
+            they're legitimate operational records that affect regulatory
+            reporting. I designed explicit confirmation flows: the user sees a
+            list of unscanned items, can cancel and continue scanning, or
+            confirm and mark items as "adjusted/missing." This produces a clean
+            audit trail rather than silent data loss — and it respects the fact
+            that the user might have made a scan error, not an inventory error.
+          </p>
+        </div>
+
+        <div class="decision-card">
+          <h3>Terminology as a design artefact</h3>
+          <p style="margin: 0; font-size: 14px">
+            Proposing and aligning on Aisle / Rack / Slot as canonical
+            terminology was a design decision, not just a content decision. It
+            prevented three separate naming systems (UX docs, spreadsheets,
+            developer database) from diverging — which would have caused bugs
+            and user confusion that no amount of screen design could fix.
+          </p>
+        </div>
+
+        <img
+          src="images/section1.jpeg"
+          alt="Storyboard sketches showing the four warehouse workflows: receiving product to master pack, master pack to case pack, and allocating case pack to bin"
+          style="width: 100%; margin: 2rem auto"
+        />
+      </div>
+    </section>
+
+    <!-- SECTION 6: IMPACT -->
+    <section id="impact">
+      <div class="container">
+        <div class="section-label">06 — Impact</div>
+        <h2>What changed after shipping</h2>
+        <p>
+          The module consolidated inventory operations from a 3–5 tab workflow
+          (Warehouse Portal + multiple Google Sheets) into a single guided
+          system. The shift from spreadsheet-based to system-recorded operations
+          also fundamentally improved error traceability — when something went
+          wrong, there was now a clear audit trail instead of a gap in a
+          spreadsheet.
+        </p>
+
+        <div class="impact-grid">
+          <div class="impact-card">
+            <div class="impact-number">1</div>
+            <div class="impact-desc">
+              Platform replacing 3–5 simultaneous tools for all bin operations
+            </div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-number">↓</div>
+            <div class="impact-desc">
+              Reduced manual data entry errors — items recorded in system, not
+              spreadsheets
+            </div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-number">~0</div>
+            <div class="impact-desc">
+              Third-party tools required for core inventory operations
+              post-launch
+            </div>
+          </div>
+        </div>
+
+           <!-- CTA BUTTON -->
+    <section style="padding: 60px 0; text-align: center; border-bottom: none;">
+      <a
+        href="https://drive.google.com/file/d/1-Bv3BOLwLuBmGmdt_3mtHARknY9uEfSI/view?usp=sharing"
+        target="_blank"
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          background: var(--accent);
+          color: #0a0e1a;
+          font-size: 14px;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          padding: 14px 32px;
+          border-radius: 8px;
+          text-decoration: none;
+          transition: background 0.2s, transform 0.2s;
+        "
+        onmouseover="this.style.background='#22d4c0';this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.background='#1abcaa';this.style.transform='translateY(0)'"
+      >
+        Final design for Dev ↗
+      </a>
+    </section>
+
+      </div>
+    </section>
+
+    <!-- SECTION 7: REFLECTION -->
+    <section id="reflection">
+      <div class="container">
+        <div class="section-label">07 — Reflection</div>
+        <h2>What I'd carry forward</h2>
+        <ul class="reflection-list">
+          <li>
+            <strong style="color: var(--text-primary); font-weight: 500"
+              >Terminology alignment is a UX decision.</strong
+            >
+            Standardising Aisle / Rack / Slot early prevented naming conflicts
+            across all four workflows, design documentation, and developer
+            handoff. It was ten minutes of alignment that saved weeks of
+            confusion.
+          </li>
+          <li>
+            <strong style="color: var(--text-primary); font-weight: 500"
+              >Designing for constraint is designing for trust.</strong
+            >
+            Hard gates — the Transfer button, the save confirmation for audits —
+            aren't friction. They're the product's promise that the data is
+            correct. Regulatory environments need those promises made visible.
+          </li>
+          <li>
+            <strong style="color: var(--text-primary); font-weight: 500"
+              >Research revealed the "why" behind rules I might have
+              changed.</strong
+            >
+            Without the discovery session I would likely have designed
+            multi-order batching as a feature — which would have actively
+            increased error rates. Observing the real workflow was the most
+            valuable hour of the project.
+          </li>
+          <li>
+            <strong style="color: var(--text-primary); font-weight: 500"
+              >Open questions surfaced during UX saved dev rework.</strong
+            >
+            Flagging doubts like "can we rescan an audited bin?" and "what
+            happens to returned MPs?" during the design phase — rather than
+            leaving them for engineering to discover — prevented late-stage
+            surprises and helped the team align on edge cases before they became
+            bugs.
+          </li>
+          <li>
+            <strong style="color: var(--text-primary); font-weight: 500"
+              >Internal tools are held to the same standard as consumer products
+              by their users.</strong
+            >
+            Warehouse pickers use this software for hours every day. Poor flows
+            don't just cause frustration — they cause financial and compliance
+            errors. That stakes clarity focused every decision.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <p>
+          Designed by
+          <a href="https://deepali-ux.github.io/DNdesign/"
+            >Deepali Nagarsekar</a
+          >
+          · Product Designer &amp; UX Strategist ·
+          <a href="https://deepali-ux.github.io/DNdesign/#work"
+            >Back to portfolio</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      window.addEventListener("scroll", () => {
+        const scrollTop = window.scrollY;
+        const docHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        document.getElementById("progress-bar").style.width = progress + "%";
+      });
+    </script>
+  </body>
+</html>
